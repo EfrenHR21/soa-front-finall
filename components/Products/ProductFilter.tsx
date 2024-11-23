@@ -4,9 +4,9 @@ import { Card, Dropdown, DropdownButton, ListGroup } from 'react-bootstrap';
 
 const ProductFilter = () => {
 	const router = useRouter();
-	const [filterCatText, setFilterCatText] = React.useState('Category');
+	const [filterCatText, setFilterCatText] = React.useState('Categoria');
 	const [filterPlatformText, setFilterPlatformText] =
-		React.useState('Platform');
+		React.useState('Plataforma');
 
 	return (
 		<Card>
@@ -32,13 +32,13 @@ const ProductFilter = () => {
 						}}
 					>
 						<Dropdown.Item href='#' eventKey=''>
-							Select category
+							Selecciona Categoria
 						</Dropdown.Item>
 						<Dropdown.Item href='#' eventKey='Operating System'>
-							Operating System
+							Sistema Operativo
 						</Dropdown.Item>
 						<Dropdown.Item href='#' eventKey='Application Software'>
-							Application Software
+							Software
 						</Dropdown.Item>
 					</DropdownButton>
 				</ListGroup.Item>
@@ -60,7 +60,7 @@ const ProductFilter = () => {
 						}}
 					>
 						<Dropdown.Item href='#' eventKey=''>
-							Select platform
+							Selecciona Plataforma
 						</Dropdown.Item>
 						<Dropdown.Item href='#' eventKey='Windows'>
 							Windows

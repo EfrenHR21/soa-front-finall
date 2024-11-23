@@ -36,8 +36,9 @@ const TopHeader =() => {
 			height='40'
 			width='40'
 			color='#4c575f'
-			className={styles.personIcon}
-		/>
+			className={styles.personIcon} onClick={() => router.push('/my-account')} 
+            /> 
+		
         </Col>
         </Row>
         <Navbar 

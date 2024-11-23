@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import { GetServerSideProps, NextPage } from "next";
-import React, { useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import queryString from 'query-string';
-import { Col, Dropdown, DropdownButton, Row } from "react-bootstrap";
+import { Button, Col, Dropdown, DropdownButton, Row } from "react-bootstrap";
 import BreadcrumbDisplay from "@/components/shared/BreadcrumbDisplay";
 import { useRouter } from "next/router";
 import ProductItem from "@/components/Products/ProductItem";
 import ProductFilter from "@/components/Products/ProductFilter";
+import PaginationDisplay from "@/components/shared/PaginationDisplay";
+import {  PlusCircle } from "react-bootstrap-icons";
+import { Context } from "@/context";
 
 
 interface Props {
@@ -16,9 +19,19 @@ interface Props {
 }
 
 const AllProducts: NextPage<Props> = ({ products, metadata }) => {
-    const [sortText, setSortText] = useState('Sort by');
-    const router = useRouter();
+    const [sortText, setSortText] = useState('Buscar por');
+    const [userType, setUserType ] = useState('customer');
 
+    const {
+        state: {user}, 
+    } = useContext(Context);
+    const router = useRouter();
+    
+    useEffect(() => {
+		if (user ) {
+			setUserType(user.type);
+		}
+	}, [user]);
     
     return 	(
         <>
@@ -29,12 +42,12 @@ const AllProducts: NextPage<Props> = ({ products, metadata }) => {
                         {
                             active: false,
                             href: '/',
-                            text: 'Home',
+                            text: 'Inicio',
                         },
                         {
                             active: true,
                             href: '',
-                            text: 'Products',
+                            text: 'Productos',
                         },
                     ]}
                 />
@@ -42,8 +55,8 @@ const AllProducts: NextPage<Props> = ({ products, metadata }) => {
             <Col md={4}>
                 <DropdownButton
                     variant='outline-secondary'
-                    title={sortText}
                     id='input-group-dropdown-2'
+                    title={sortText}
                     onSelect={(e) => {
                         if (e) {
                             setSortText(
@@ -62,21 +75,34 @@ const AllProducts: NextPage<Props> = ({ products, metadata }) => {
                         }
                     }}
                 >
-                    <Dropdown.Item eventKey='-avgRating'>          Rating               </Dropdown.Item>
-                    <Dropdown.Item eventKey='-createdAt'>            Latest                </Dropdown.Item>
-                    <Dropdown.Item eventKey=''>               Reset             </Dropdown.Item>
+                    <Dropdown.Item eventKey='-avgRating'> Mas buscados    </Dropdown.Item>
+                    <Dropdown.Item eventKey='-createdAt'>  Ultimos       </Dropdown.Item>
+                    <Dropdown.Item eventKey=''>     Reset      </Dropdown.Item>
                 </DropdownButton>
+                {userType === 'admin' && (
+                    <Button 
+                    className='btn btn-primary btnAddProduct'
+                    onClick={() => router.push('/products/update-product')}
+                    >
+                        <PlusCircle className='btnAddProductIcon' />
+                      Añadir Producto
+                    </Button>  
+						
+					)}
             </Col>
         </Row>
         <Row>
-        <Col sm={2}>	<ProductFilter />	</Col>
+
+        <Col sm={2}>	
+            <ProductFilter />	
+        </Col>
 				<Col sm={10}>
 					<Row xs={1} md={3} className='g-3'>
 						{products && products.length > 0 ? (
 							products.map((product: Record<string, any>) => (
 								<ProductItem
 									key={product._id }
-									userType='customer'
+									userType={userType}
 									product={product}
 								/>
 							))
@@ -88,7 +114,7 @@ const AllProducts: NextPage<Props> = ({ products, metadata }) => {
         </Row>
         <Row>
             <Col>
-               
+               <PaginationDisplay metadata={metadata} />
             </Col>
         </Row>
     </>

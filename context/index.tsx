@@ -97,7 +97,7 @@ const Provider = ({ children }: Props) => {
 		const getCSRF_token = async () => {
 		  
 			const {data} = await axios.get('/api/v1/csrf-token');
-			axios.defaults.headers['X-CSRF-TOKEN'] = data.result;
+			axios.defaults.headers.common['X-CSRF-TOKEN'] = data.result;
 		  };
 		
 	  

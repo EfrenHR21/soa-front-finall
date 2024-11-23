@@ -22,7 +22,7 @@ const Home: NextPage<Props> = ({ products, metadata}) => {
             <Row className='g-4' xs={4} md={4}>
                 {products.latestProducts &&
                     products.latestProducts.map((product: any, index: React.Key) => (
-                        <ProductItem product={product} userType={'admin'} key={index} />
+                        <ProductItem product={product} userType={'customer'} key={index} />
                     ))
                 }
             </Row>
@@ -31,7 +31,7 @@ const Home: NextPage<Props> = ({ products, metadata}) => {
             <Row className='g-4' xs={4} md={4}>
                 {products.topRatedProducts &&
                     products.topRatedProducts.map((product: any, index: React.Key) => (
-                        <ProductItem product={product} userType={'admin'} key={index} />
+                        <ProductItem product={product} userType={'customer'} key={index} />
                     ))
                 }
             </Row>

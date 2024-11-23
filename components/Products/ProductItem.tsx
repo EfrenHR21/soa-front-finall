@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Products } from '@/services/Product.service';
 import { getFormatedStringFromDays } from '@/utils';
 import { useRouter } from 'next/router';
 import React, { FC } from 'react'
@@ -7,6 +8,7 @@ import { Badge, Button, Card, Col } from 'react-bootstrap';
 import { Eye, Link, Pen, Trash, Upload } from 'react-bootstrap-icons';
 import StarRatingComponent from 'react-star-rating-component';
 import { useToasts } from 'react-toast-notifications';
+import { isArray } from 'util';
 
 interface Props {
     product: Record<string, any>;
@@ -14,7 +16,88 @@ interface Props {
 }
 
 const ProductItem: FC<Props> = ({ product, userType }) => {
-    
+    const { addToast } = useToasts();
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [uploading, setUploading] = React.useState(false);
+	const router = useRouter();
+	const deleteProduct = async () => {
+		try {
+			setIsLoading(true);
+			const deleteConfirm = confirm(
+				'Want to delete? You will lost all details, skus and licences for this product'
+			);
+			if (deleteConfirm) {
+				const deleteProductRes = await Products.deleteProduct(product._id);
+				if (!deleteProductRes.success) {
+					throw new Error(deleteProductRes.message);
+				}
+				router.push('/products/');
+				addToast(deleteProductRes.message, {
+					appearance: 'success',
+					autoDismiss: true,
+				});
+			}
+		} catch (error: any) {
+			if (error.response) {
+				if (
+					isArray(error.response.data?.message) &&
+					Array.isArray(error.response?.data?.message)
+				) {
+					return error.response.data.message.forEach((message: any) => {
+						addToast(message, { appearance: 'error', autoDismiss: true });
+					});
+				} else {
+					return addToast(error.response.data.message, {
+						appearance: 'error',
+						autoDismiss: true,
+					});
+				}
+			}
+			addToast(error.message, { appearance: 'error', autoDismiss: true });
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const uploadProductImage = async (e: any) => {
+		try {
+			setUploading(true);
+			const file = e.target.files[0];
+			const formData = new FormData();
+			formData.append('productImage', file);
+			const uploadProductImageRes = await Products.uploadProductImage(
+				product._id,
+				formData
+			);
+			if (!uploadProductImageRes.success) {
+				throw new Error(uploadProductImageRes.message);
+			}
+			product.image = uploadProductImageRes.result;
+			addToast(uploadProductImageRes.message, {
+				appearance: 'success',
+				autoDismiss: true,
+			});
+		} catch (error: any) {
+			if (error.response) {
+				if (
+					isArray(error.response.data?.message) &&
+					Array.isArray(error.response?.data?.message)
+				) {
+					return error.response.data.message.forEach((message: any) => {
+						addToast(message, { appearance: 'error', autoDismiss: true });
+					});
+				}
+				return addToast(error.response.data.message, {
+					appearance: 'error',
+					autoDismiss: true,
+				});
+			}
+			addToast(error.message, { appearance: 'error', autoDismiss: true });
+		} finally {
+			setUploading(false);
+		}
+	};
+	
     return (
 		// eslint-disable-next-line react/jsx-key
 		<Col>
@@ -61,12 +144,48 @@ const ProductItem: FC<Props> = ({ product, userType }) => {
 								</Badge>
 							))}
 					<br />
-					<Link href={`/products/${product?._id}`}
-							className='btn btn-outline-dark viewProdBtn'>
+					{userType === 'admin' ? (
+						<div className='btnGrpForProduct'>
+							<div className='file btn btn-md btn-outline-primary fileInputDiv'>
+								<Upload />
+								<input
+									type='file'
+									name='file'
+									className='fileInput'
+									onChange={uploadProductImage}
+								/>
+							</div>
+							<Link href={`/products/update-product?productId=${product?._id}`}
+								className='btn btn-outline-dark viewProdBtn'
+								>
+									<Pen />								
+							</Link>
+							<Button
+								variant='outline-dark'
+								className='btn btn-outline-dark viewProdBtn'
+								onClick={() => deleteProduct()}
+							>
+								{isLoading && (
+									<span
+										className='spinner-border spinner-border-sm mr-2'
+										role='status'
+										aria-hidden='true'
+									></span>
+								)}
+								<Trash />
+							</Button>
+							<Link href={`/products/update-product?productId=${product?._id}`}
+								className='btn btn-outline-dark viewProdBtn'>
+									<Eye />
+							</Link>
+						</div>
+					):(
+					<Link href={``}	className='btn btn-outline-dark viewProdBtn'>
 								<Eye />
 								Ver Detalles
 							
 						</Link>
+						)}
 				</Card.Body>
 			</Card>
 		</Col>

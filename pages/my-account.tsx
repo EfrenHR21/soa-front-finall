@@ -47,7 +47,7 @@ const MyAccount = () => {
 					<Nav variant='pills' className='flex-column'>
 						<Nav.Item>
 							<Nav.Link eventKey='first'>
-								Account Details
+								Cuenta
 							</Nav.Link>
 						</Nav.Item>
 						<Nav.Item>
